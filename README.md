@@ -66,8 +66,8 @@ Production-ready Docker Compose setup for **Odoo 18 Community Edition** with **P
 #### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd podman_docker_app
+git clone https://github.com/WOOWTECH/Woow_odoo_docker_compose_all.git
+cd Woow_odoo_docker_compose_all
 ```
 
 #### 2. Configure environment
@@ -253,8 +253,8 @@ sudo chown -R 101:101 ./addons
 #### 1. 複製專案
 
 ```bash
-git clone <repository-url>
-cd podman_docker_app
+git clone https://github.com/WOOWTECH/Woow_odoo_docker_compose_all.git
+cd Woow_odoo_docker_compose_all
 ```
 
 #### 2. 配置環境變數
