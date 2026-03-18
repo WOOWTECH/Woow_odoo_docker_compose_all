@@ -1,0 +1,84 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  namespace: odoo
+  labels:
+    app: odoo
+    component: database
+spec:
+  serviceName: db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: odoo
+      component: database
+  template:
+    metadata:
+      labels:
+        app: odoo
+        component: database
+    spec:
+      containers:
+        - name: postgres
+          image: pgvector/pgvector:pg16
+          ports:
+            - containerPort: 5432
+              name: postgres
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: odoo-db-secret
+          volumeMounts:
+            - name: odoo-db-data
+              mountPath: /var/lib/postgresql/data
+              subPath: pgdata
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - odoo
+                - -d
+                - postgres
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - odoo
+                - -d
+                - postgres
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - odoo
+                - -d
+                - postgres
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 30
+      restartPolicy: Always
+      volumes:
+        - name: odoo-db-data
+          persistentVolumeClaim:
+            claimName: odoo-db-data
