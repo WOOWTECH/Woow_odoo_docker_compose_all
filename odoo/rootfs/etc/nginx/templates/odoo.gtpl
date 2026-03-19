@@ -1,6 +1,6 @@
 # Odoo backend upstream
 upstream odoo {
-    server 127.0.0.1:{{ .port }};
+    server 127.0.0.1:{{ .backend_port }};
 }
 
 # Odoo WebSocket/Longpolling upstream
@@ -9,7 +9,7 @@ upstream odoochat {
 }
 
 server {
-    listen {{ .port }} default_server;
+    listen {{ .listen_port }} default_server;
 
     server_name _;
 

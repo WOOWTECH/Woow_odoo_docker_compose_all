@@ -15,7 +15,16 @@ MEM_HARD=$(jq -r '.odoo_limit_memory_hard // 2684354560' "$OPTIONS_SOURCE")
 MEM_SOFT=$(jq -r '.odoo_limit_memory_soft // 2147483648' "$OPTIONS_SOURCE")
 TIME_CPU=$(jq -r '.odoo_limit_time_cpu // 60' "$OPTIONS_SOURCE")
 TIME_REAL=$(jq -r '.odoo_limit_time_real // 120' "$OPTIONS_SOURCE")
-LOG_LEVEL=$(jq -r '.odoo_log_level // "info"' "$OPTIONS_SOURCE")
+LOG_LEVEL_RAW=$(jq -r '.odoo_log_level // "info"' "$OPTIONS_SOURCE")
+# Map to Python logging uppercase levels for log_handler
+case "$LOG_LEVEL_RAW" in
+    debug) LOG_HANDLER_LEVEL="DEBUG" ;;
+    info)  LOG_HANDLER_LEVEL="INFO" ;;
+    warn)  LOG_HANDLER_LEVEL="WARNING" ;;
+    error) LOG_HANDLER_LEVEL="ERROR" ;;
+    critical) LOG_HANDLER_LEVEL="CRITICAL" ;;
+    *)     LOG_HANDLER_LEVEL="INFO" ;;
+esac
 PROXY_MODE=$(jq -r '.odoo_proxy_mode // true' "$OPTIONS_SOURCE")
 EXTRA_ADDONS=$(jq -r '.odoo_extra_addons // empty' "$OPTIONS_SOURCE")
 DB_NAME=$(jq -r '.odoo_db_name // "odoo"' "$OPTIONS_SOURCE")
@@ -47,7 +56,7 @@ data_dir = /data/odoo
 addons_path = ${ADDONS_PATH}
 
 ; Server
-http_port = 8069
+http_port = 8169
 gevent_port = 8072
 proxy_mode = ${PROXY_MODE}
 server_wide_modules = web
@@ -63,12 +72,11 @@ limit_time_cpu = ${TIME_CPU}
 limit_time_real = ${TIME_REAL}
 
 ; Logging
-log_level = ${LOG_LEVEL}
 logfile = /data/logs/odoo/odoo.log
-log_handler = :${LOG_LEVEL}
+log_handler = :${LOG_HANDLER_LEVEL}
 
 ; Security
-list_db = False
+list_db = True
 EOF
 
 # Set admin password if provided

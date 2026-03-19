@@ -47,12 +47,20 @@ else
     fi
 
     # Initialize the database as postgres user
+    # Use a temp file for password instead of process substitution
+    # (process substitution /dev/fd/N is not accessible after s6-setuidgid)
+    PW_FILE="$(mktemp)"
+    printf "%s\n" "$POSTGRES_PASSWORD" > "$PW_FILE"
+    chmod 644 "$PW_FILE"
+
     s6-setuidgid postgres initdb \
         --username="$POSTGRES_USER" \
-        --pwfile=<(printf "%s\n" "$POSTGRES_PASSWORD") \
+        --pwfile="$PW_FILE" \
         --encoding=UTF8 \
         --locale=en_US.UTF-8 \
         -D "$PGDATA"
+
+    rm -f "$PW_FILE"
 
     # Cleanup nss_wrapper
     if [[ "${LD_PRELOAD:-}" == */libnss_wrapper.so ]]; then
