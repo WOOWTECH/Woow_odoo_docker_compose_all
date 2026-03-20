@@ -57,4 +57,3 @@ options:
   odoo_db_name: odoo
   odoo_without_demo: true
   env_vars: []
-image: woowtech/woow-odoo
